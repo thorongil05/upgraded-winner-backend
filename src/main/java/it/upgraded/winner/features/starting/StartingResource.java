@@ -2,9 +2,9 @@ package it.upgraded.winner.features.starting;
 
 import org.jboss.logging.Logger;
 
-import it.upgraded.winner.features.player.rest.PlayerRestDto;
 import it.upgraded.winner.features.starting.mapper.StartingRestDtoMapper;
 import it.upgraded.winner.features.starting.rest.StartingRestDto;
+import it.upgraded.winner.features.starting.rest.ValidationResult;
 import it.upgraded.winner.model.Starting;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -16,7 +16,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 @ApplicationScoped
-@Path("/startings")
+@Path("/v1/startings")
 public class StartingResource {
 
     private final Logger logger = Logger.getLogger(StartingResource.class);
@@ -31,8 +31,9 @@ public class StartingResource {
     @Path("validate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(StartingRestDto startingRestDto) {
+    public Response validate(StartingRestDto startingRestDto) {
         try {
+            logger.info("Received request");
             Starting starting = StartingRestDtoMapper.map(startingRestDto);
             ValidationResult result = startingService.validate(starting);
             return Response.ok(result).build();

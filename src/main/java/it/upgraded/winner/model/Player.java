@@ -10,24 +10,27 @@ public class Player {
         return name;
     }
 
-    public void setName(String name) {
+    public Player setName(String name) {
         this.name = name;
+        return this;
     }
 
     public Role getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public Player setRole(Role role) {
         this.role = role;
+        return this;
     }
 
     public String getTeam() {
         return team;
     }
 
-    public void setTeam(String team) {
+    public Player setTeam(String team) {
         this.team = team;
+        return this;
     }
 
 }

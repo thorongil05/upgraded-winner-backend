@@ -1,7 +1,6 @@
 package it.upgraded.winner.features.starting;
 
-import it.upgraded.winner.features.starting.rest.StartingPlayerRestDto;
-import it.upgraded.winner.features.starting.rest.StartingRestDto;
+import it.upgraded.winner.features.starting.rest.ValidationResult;
 import it.upgraded.winner.model.Player;
 import it.upgraded.winner.model.Role;
 import it.upgraded.winner.model.Starting;
@@ -12,28 +11,27 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.stream.*;
 import java.util.Map;
-import java.util.HashMap;
 
 @ApplicationScoped
 public class StartingService {
 
     public ValidationResult validate(Starting starting) {
         List<String> validationErrorList = new ArrayList<>();
-        //
         List<Player> allPlayers = Stream.concat(starting.getStartingEleven().stream(), starting.getBench().stream())
                 .toList();
         if (allPlayers.size() != 17) {
             validationErrorList.add("Total number of players is wrong");
         }
-        if (allPlayers.stream().map(Player::getRole).filter(role -> Role.GOALKEEPER.equals(role)).count() == 1) {
-            validationErrorList.add("Only one goalkeeper is accepted");
-        }
         Map<Role, Integer> startingElevenRolesMap = extractRolesMap(starting.getStartingEleven());
+        Integer goalkeepers = startingElevenRolesMap.getOrDefault(Role.GOALKEEPER, 0);
         Integer defenders = startingElevenRolesMap.getOrDefault(Role.DEFENDER, 0);
         Integer midfielders = startingElevenRolesMap.getOrDefault(Role.MIDFIELDER, 0);
         Integer strickers = startingElevenRolesMap.getOrDefault(Role.STRICKER, 0);
-        Integer total = defenders + midfielders + strickers;
-        if (total != 10) {
+        Integer total = goalkeepers + defenders + midfielders + strickers;
+        if (goalkeepers != 1) {
+            validationErrorList.add("Only one goalkeeper is accepted");
+        }
+        if (total != 11) {
             validationErrorList.add("Number of starting XI is wrong");
         }
         if (defenders == 4) {
@@ -52,7 +50,7 @@ public class StartingService {
 
     private Map<Role, Integer> extractRolesMap(List<Player> startingEleven) {
         EnumMap<Role, Integer> rolesMap = new EnumMap<>(Role.class);
-        startingEleven.stream().map(Player::getRole).filter(role -> !Role.GOALKEEPER.equals(role)).forEach(role -> {
+        startingEleven.stream().map(Player::getRole).forEach(role -> {
             Integer current = rolesMap.getOrDefault(role, 0);
             rolesMap.put(role, current + 1);
         });

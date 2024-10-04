@@ -1,4 +1,4 @@
-package it.upgraded.winner.features.starting;
+package it.upgraded.winner.features.starting.rest;
 
 import java.util.List;
 import java.util.ArrayList;

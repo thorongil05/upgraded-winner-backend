@@ -13,19 +13,16 @@ public class StartingRestDtoMapper {
 
   public static Starting map(StartingRestDto startingRestDto) {
     Starting starting = new Starting();
-    startingRestDto.getStartingEleven().forEach(playerDto -> {
-      starting.getStartingEleven().add(mapDtoToPlayer(playerDto));
-    });
-    startingRestDto.getBench().forEach(playerDto -> {
-      starting.getBench().add(mapDtoToPlayer(playerDto));
-    });
+    startingRestDto.getStartingEleven()
+        .forEach(playerDto -> starting.getStartingEleven().add(mapDtoToPlayer(playerDto)));
+    startingRestDto.getBench().forEach(playerDto -> starting.getBench().add(mapDtoToPlayer(playerDto)));
     return starting;
   }
 
   static Player mapDtoToPlayer(StartingPlayerRestDto playerDto) {
     Player player = new Player();
     player.setName(playerDto.getName());
-    player.setRole(Role.valueOf(playerDto.getRole()));
+    player.setRole(Role.fromString(playerDto.getRole()));
     player.setTeam(playerDto.getTeam());
     return player;
   }
