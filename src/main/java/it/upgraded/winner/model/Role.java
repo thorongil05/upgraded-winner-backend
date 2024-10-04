@@ -1,4 +1,4 @@
-package it.upgraded.winner.features.player.model;
+package it.upgraded.winner.model;
 
 public enum Role {
     GOALKEEPER,
