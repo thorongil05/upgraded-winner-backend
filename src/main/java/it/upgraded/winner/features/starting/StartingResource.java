@@ -2,6 +2,8 @@ package it.upgraded.winner.features.starting;
 
 import org.jboss.logging.Logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import it.upgraded.winner.features.starting.mapper.StartingRestDtoMapper;
 import it.upgraded.winner.features.starting.rest.StartingRestDto;
 import it.upgraded.winner.features.starting.rest.ValidationResult;
@@ -21,10 +23,12 @@ public class StartingResource {
 
     private final Logger logger = Logger.getLogger(StartingResource.class);
     private final StartingService startingService;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public StartingResource(StartingService startingService) {
+    public StartingResource(StartingService startingService, ObjectMapper objectMapper) {
         this.startingService = startingService;
+        this.objectMapper = objectMapper;
     }
 
     @POST
@@ -33,7 +37,7 @@ public class StartingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response validate(StartingRestDto startingRestDto) {
         try {
-            logger.info("Received request");
+            logger.info("Received request" + objectMapper.writeValueAsString(startingRestDto));
             Starting starting = StartingRestDtoMapper.map(startingRestDto);
             ValidationResult result = startingService.validate(starting);
             return Response.ok(result).build();
