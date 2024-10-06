@@ -9,6 +9,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.stream.*;
 import java.util.Map;
 
@@ -22,6 +23,12 @@ public class StartingService {
         if (allPlayers.size() != 17) {
             validationErrorList.add("Total number of players is wrong");
         }
+        Map<String, Integer> teamsMap = extractTeamsMap(allPlayers);
+        teamsMap.forEach((team, counter) -> {
+            if (counter > 1) {
+                validationErrorList.add(String.format("%s has %s players", team, counter));
+            }
+        });
         Map<Role, Integer> startingElevenRolesMap = extractRolesMap(starting.getStartingEleven());
         Integer goalkeepers = startingElevenRolesMap.getOrDefault(Role.GOALKEEPER, 0);
         Integer defenders = startingElevenRolesMap.getOrDefault(Role.DEFENDER, 0);
@@ -46,6 +53,15 @@ public class StartingService {
                 validationErrorList.add("With 3 defenders there could be only 3-5-2, 3-4-3");
         }
         return ValidationResult.of(validationErrorList);
+    }
+
+    private Map<String, Integer> extractTeamsMap(List<Player> allPlayers) {
+        Map<String, Integer> teamsMap = new HashMap<>();
+        allPlayers.stream().map(Player::getTeam).forEach(team -> {
+            Integer current = teamsMap.getOrDefault(team, 0);
+            teamsMap.put(team, current + 1);
+        });
+        return teamsMap;
     }
 
     private Map<Role, Integer> extractRolesMap(List<Player> startingEleven) {
