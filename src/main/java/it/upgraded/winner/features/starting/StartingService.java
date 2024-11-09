@@ -4,7 +4,10 @@ import it.upgraded.winner.features.starting.rest.ValidationResult;
 import it.upgraded.winner.model.Player;
 import it.upgraded.winner.model.Role;
 import it.upgraded.winner.model.Starting;
+import it.upgraded.winner.utils.logging.Logger;
+import it.upgraded.winner.utils.logging.LoggerFactory;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -15,6 +18,13 @@ import java.util.Map;
 
 @ApplicationScoped
 public class StartingService {
+
+    private final Logger logger;
+
+    @Inject
+    public StartingService(LoggerFactory loggerFactory) {
+        this.logger = loggerFactory.getLogger(StartingService.class);
+    }
 
     public ValidationResult validate(Starting starting) {
         List<String> validationErrorList = new ArrayList<>();
@@ -61,6 +71,7 @@ public class StartingService {
             Integer current = teamsMap.getOrDefault(team, 0);
             teamsMap.put(team, current + 1);
         });
+        logger.info().object("Teams map", teamsMap).end();
         return teamsMap;
     }
 
@@ -70,6 +81,7 @@ public class StartingService {
             Integer current = rolesMap.getOrDefault(role, 0);
             rolesMap.put(role, current + 1);
         });
+        logger.info().object("Roles map", rolesMap).end();
         return rolesMap;
     }
 

@@ -10,6 +10,7 @@ import it.upgraded.winner.features.starting.rest.ValidationResult;
 import it.upgraded.winner.model.Player;
 import it.upgraded.winner.model.Role;
 import it.upgraded.winner.model.Starting;
+import it.upgraded.winner.utils.logging.LoggerFactoryMockProvider;
 
 class StartingServiceTest {
 
@@ -17,7 +18,7 @@ class StartingServiceTest {
 
   @BeforeAll
   static void setup() {
-    startingService = new StartingService();
+    startingService = new StartingService(LoggerFactoryMockProvider.provide());
   }
 
   @Test

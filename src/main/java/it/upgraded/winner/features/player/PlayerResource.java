@@ -2,9 +2,9 @@ package it.upgraded.winner.features.player;
 
 import java.util.List;
 
-import org.jboss.logging.Logger;
-
 import it.upgraded.winner.features.player.rest.PlayerRestDto;
+import it.upgraded.winner.utils.logging.Logger;
+import it.upgraded.winner.utils.logging.LoggerFactory;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -17,12 +17,13 @@ import jakarta.ws.rs.core.Response;
 @Path("/v1/players")
 public class PlayerResource {
 
-    private static final Logger logger = Logger.getLogger(PlayerResource.class);
+    private Logger logger;
     private final PlayerService playerService;
 
     @Inject
-    public PlayerResource(PlayerService playerService) {
+    public PlayerResource(PlayerService playerService, LoggerFactory loggerFactory) {
         this.playerService = playerService;
+        this.logger = loggerFactory.getLogger(PlayerResource.class);
     }
 
     @POST
@@ -31,11 +32,11 @@ public class PlayerResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(PlayerRestDto player) {
         try {
-            logger.info(player);
+            logger.info().object("Player", player).end();
             playerService.savePlayer(player);
             return Response.ok().build();
         } catch (Exception e) {
-            logger.error("Error creating player", e);
+            logger.error().token("MESSAGE", e.getMessage()).end();
             return Response.serverError().build();
         }
     }
