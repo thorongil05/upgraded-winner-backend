@@ -51,16 +51,11 @@ public class StartingService {
         if (total != 11) {
             validationErrorList.add("Number of starting XI is wrong");
         }
-        if (defenders == 4) {
-            boolean isValid = (midfielders == 3 && strickers == 3) || (midfielders == 4 && strickers == 2)
-                    || (midfielders == 5 && strickers == 1);
-            if (!isValid)
-                validationErrorList.add("With 4 defenders there could be only 4-3-3, 4-4-2 and 4-5-1");
+        if (defenders == 4 && !isValidFourDefendersModule(midfielders, strickers)) {
+            validationErrorList.add("With 4 defenders there could be only 4-3-3, 4-4-2 and 4-5-1");
         }
-        if (defenders == 3) {
-            boolean isValid = (midfielders == 5 && strickers == 2) || (midfielders == 4 && strickers == 3);
-            if (!isValid)
-                validationErrorList.add("With 3 defenders there could be only 3-5-2, 3-4-3");
+        if (defenders == 3 && !isValidThreeDefendersModule(midfielders, strickers)) {
+            validationErrorList.add("With 3 defenders there could be only 3-5-2, 3-4-3");
         }
         return ValidationResult.of(validationErrorList);
     }
@@ -83,6 +78,24 @@ public class StartingService {
         });
         logger.info().object("Roles map", rolesMap).end();
         return rolesMap;
+    }
+
+    boolean isValidFourDefendersModule(int midfielders, int strickers) {
+        if (midfielders == 3 && strickers == 3)
+            return true;
+        if (midfielders == 4 && strickers == 2)
+            return true;
+        if (midfielders == 5 && strickers == 1)
+            return true;
+        return false;
+    }
+
+    boolean isValidThreeDefendersModule(int midfielders, int strickers) {
+        if (midfielders == 5 && strickers == 2)
+            return true;
+        if (midfielders == 4 && strickers == 3)
+            return true;
+        return false;
     }
 
 }
