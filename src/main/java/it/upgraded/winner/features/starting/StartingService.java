@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.stream.*;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @ApplicationScoped
 public class StartingService {
@@ -39,22 +39,19 @@ public class StartingService {
                 validationErrorList.add(String.format("%s has %s players", team, counter));
             }
         });
-        Map<Role, Integer> startingElevenRolesMap = extractRolesMap(starting.getStartingEleven());
-        Integer goalkeepers = startingElevenRolesMap.getOrDefault(Role.GOALKEEPER, 0);
-        Integer defenders = startingElevenRolesMap.getOrDefault(Role.DEFENDER, 0);
-        Integer midfielders = startingElevenRolesMap.getOrDefault(Role.MIDFIELDER, 0);
-        Integer strickers = startingElevenRolesMap.getOrDefault(Role.STRICKER, 0);
-        Integer total = goalkeepers + defenders + midfielders + strickers;
-        if (goalkeepers != 1) {
+        RoleInfo roleInfo = extractRoleInfo(starting.getStartingEleven());
+        if (roleInfo.getGoalkeeper() != 1) {
             validationErrorList.add("Only one goalkeeper is accepted");
         }
-        if (total != 11) {
+        if (roleInfo.getTotal() != 11) {
             validationErrorList.add("Number of starting XI is wrong");
         }
-        if (defenders == 4 && !isValidFourDefendersModule(midfielders, strickers)) {
+        if (roleInfo.getDefenders() == 4
+                && !isValidFourDefendersModule(roleInfo.getMidfielders(), roleInfo.getStrickers())) {
             validationErrorList.add("With 4 defenders there could be only 4-3-3, 4-4-2 and 4-5-1");
         }
-        if (defenders == 3 && !isValidThreeDefendersModule(midfielders, strickers)) {
+        if (roleInfo.getDefenders() == 3
+                && !isValidThreeDefendersModule(roleInfo.getMidfielders(), roleInfo.getStrickers())) {
             validationErrorList.add("With 3 defenders there could be only 3-5-2, 3-4-3");
         }
         return ValidationResult.of(validationErrorList);
@@ -70,14 +67,18 @@ public class StartingService {
         return teamsMap;
     }
 
-    private Map<Role, Integer> extractRolesMap(List<Player> startingEleven) {
+    private RoleInfo extractRoleInfo(List<Player> startingEleven) {
         EnumMap<Role, Integer> rolesMap = new EnumMap<>(Role.class);
         startingEleven.stream().map(Player::getRole).forEach(role -> {
             Integer current = rolesMap.getOrDefault(role, 0);
             rolesMap.put(role, current + 1);
         });
         logger.info().object("Roles map", rolesMap).end();
-        return rolesMap;
+        Integer goalkeepers = rolesMap.getOrDefault(Role.GOALKEEPER, 0);
+        Integer defenders = rolesMap.getOrDefault(Role.DEFENDER, 0);
+        Integer midfielders = rolesMap.getOrDefault(Role.MIDFIELDER, 0);
+        Integer strickers = rolesMap.getOrDefault(Role.STRICKER, 0);
+        return new RoleInfo(goalkeepers, defenders, midfielders, strickers);
     }
 
     boolean isValidFourDefendersModule(int midfielders, int strickers) {
@@ -85,17 +86,47 @@ public class StartingService {
             return true;
         if (midfielders == 4 && strickers == 2)
             return true;
-        if (midfielders == 5 && strickers == 1)
-            return true;
-        return false;
+        return (midfielders == 5 && strickers == 1);
     }
 
     boolean isValidThreeDefendersModule(int midfielders, int strickers) {
         if (midfielders == 5 && strickers == 2)
             return true;
-        if (midfielders == 4 && strickers == 3)
-            return true;
-        return false;
+        return (midfielders == 4 && strickers == 3);
+    }
+
+    class RoleInfo {
+        private int goalkeeper;
+        private int defenders;
+        private int midfielders;
+        private int strickers;
+
+        public RoleInfo(int goalkeeper, int defenders, int midfielders, int strickers) {
+            this.goalkeeper = goalkeeper;
+            this.defenders = defenders;
+            this.midfielders = midfielders;
+            this.strickers = strickers;
+        }
+
+        public int getGoalkeeper() {
+            return goalkeeper;
+        }
+
+        public int getDefenders() {
+            return defenders;
+        }
+
+        public int getMidfielders() {
+            return midfielders;
+        }
+
+        public int getStrickers() {
+            return strickers;
+        }
+
+        public int getTotal() {
+            return goalkeeper + defenders + midfielders + strickers;
+        }
     }
 
 }

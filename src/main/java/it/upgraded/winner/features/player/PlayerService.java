@@ -28,9 +28,7 @@ public class PlayerService {
 
     public void savePlayer(PlayerRestDto player) {
         logger.info(player);
-        Document document = new Document()
-                .append("name", player.getName())
-                .append("role", player.getRole())
+        Document document = new Document().append("name", player.getName()).append("role", player.getRole())
                 .append("team", player.getTeam());
         InsertOneResult insertOne = getCollection().insertOne(document);
         logger.info(insertOne);
@@ -56,9 +54,10 @@ public class PlayerService {
     }
 
     public void updatePlayer() {
+        throw new IllegalStateException("Not implemented yet");
     }
 
-    private MongoCollection getCollection() {
+    private MongoCollection<Document> getCollection() {
         return mongoClient.getDatabase("upgraded-winner").getCollection("players");
     }
 
